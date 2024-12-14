@@ -1,0 +1,3 @@
+Press R: Generates a random graph.
+Press C: Clears all nodes and edges from the screen.
+Press E: Exits the program.
