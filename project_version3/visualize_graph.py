@@ -155,6 +155,7 @@ def handle_key_event(key, graph, selected_node):
 
     # Map keys to algorithms (1-8)
     algorithm_keys = {
+        pygame.K_0:0,   
         pygame.K_1: 1,  # BFS
         pygame.K_2: 2,  # DFS
         pygame.K_3: 3,  # Dijkstra
@@ -162,7 +163,9 @@ def handle_key_event(key, graph, selected_node):
         pygame.K_5: 5,  # Bellman-Ford
         pygame.K_6: 6,  # Kruskal's
         pygame.K_7: 7,  # Floyd-Warshall
-        pygame.K_8: 8   # Topological Sort
+        pygame.K_8: 8,  # Topological Sort
+        pygame.K_9: 9,   # MaxFlow
+       
     }
 
     # Check if the key corresponds to an algorithm
@@ -227,6 +230,8 @@ def get_node_info(node, graph):
     edges_info = "\n".join(edges) if edges else "No edges connected"
     return f"Node {node.label} at ({node.x}, {node.y})\nConnected Edges:\n{edges_info}"
 
+import time  # For adding a delay before exiting
+
 
 def main():
     graph = Graph()  # Initialize the graph
@@ -273,8 +278,33 @@ def main():
                         graph.generate_random_graph(num_nodes, num_edges)
                 elif event.key == pygame.K_c:  # Clear the graph
                     graph = Graph()
+
                 elif event.key == pygame.K_e:  # Exit the program
                     running = False
+                    
+                    # Special exit effect
+                    screen.fill(WHITE)
+                    font = pygame.font.SysFont(None, 48)  # Adjust font size to fit better
+
+                    # Split the string into lines to fit the screen better
+                    goodbye_text_lines = [
+                        "We hope you enjoyed graphing!",
+                        "Remember, graphs are like relationships:",
+                        "they have their ups and downs,",
+                        "but they're always better with connections.",
+                        "See you next time!"
+                    ]
+
+                    # Render each line of the goodbye message
+                    y_offset = HEIGHT // 2 - len(goodbye_text_lines) * 24 // 2  # Center the text vertically
+                    for line in goodbye_text_lines:
+                        line_text = font.render(line, True, (138, 88, 197))  # Purple color
+                        screen.blit(line_text, (WIDTH // 2 - line_text.get_width() // 2, y_offset))
+                        y_offset += 50  # Space between lines
+
+                    pygame.display.update()  # Update the display to show the goodbye message
+                    time.sleep(8)  # Show the goodbye message for 3 seconds
+
                 elif event.key == pygame.K_d:  # Delete a node
                     x, y = pygame.mouse.get_pos()
                     if x < WIDTH - WIDTH // 3 and zoom_level == 1:  # Ensure click is in the graph visualization area
@@ -312,8 +342,6 @@ def main():
 
     pygame.quit()  # Quit pygame
     sys.exit()  # Exit the program
-
-
 
 if __name__ == "__main__":
     main()

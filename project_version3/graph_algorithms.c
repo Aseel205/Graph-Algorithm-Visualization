@@ -301,6 +301,86 @@ void floyd_warshall(Graph* graph) {
         printf("\n");
     }
 }
+ 
+bool bfsMaxFlow(Graph* graph, int source, int sink, int parent[]) {
+    int visited[MAX_NODES] = {0};
+    Queue q;
+    initQueue(&q);
+    visited[source] = 1;
+    enqueue(&q, source);
+
+    while (!isQueueEmpty(&q)) {
+        int u = dequeue(&q);
+
+        for (int v = 0; v < graph->V; v++) {
+            // Only consider the edge if there's available capacity
+            if (graph->weights[u][v] > 0 && !visited[v]) {
+                visited[v] = 1;
+                enqueue(&q, v);
+                parent[v] = u;
+                if (v == sink) return true;  // If we reached the sink, return true
+            }
+        }
+    }
+
+    return false;
+}
+
+// Ford-Fulkerson algorithm to calculate the max flow
+void maxFlow(Graph* graph, int source, int sink) {
+    int parent[MAX_NODES];  // Array to store the path
+    int maxFlow = 0;
+
+    // Augment the flow while there's a path from source to sink
+    while (bfsMaxFlow(graph, source, sink, parent)) {
+        int pathFlow = INT_MAX;
+
+        // Find the maximum flow in the path found by BFS
+        for (int v = sink; v != source; v = parent[v]) {
+            int u = parent[v];
+            pathFlow = (pathFlow < graph->weights[u][v]) ? pathFlow : graph->weights[u][v];
+        }
+
+        // Update residual capacities of the edges and reverse edges
+        for (int v = sink; v != source; v = parent[v]) {
+            int u = parent[v];
+            graph->weights[u][v] -= pathFlow;  // Decrease the flow on the forward edge
+            graph->weights[v][u] += pathFlow;  // Increase the flow on the reverse edge
+        }
+
+        maxFlow += pathFlow;  // Add the flow of this path to the total max flow
+    }
+
+    // Print the result
+    printf("Max Flow from node %d to node %d: %d\n", source, sink, maxFlow);
+}
+
+
+void graph_metrics(Graph* graph) {
+    int node_count = graph->V;
+    int edge_count = 0;
+
+    // Calculate edge count
+    for (int i = 0; i < graph->V; i++) {
+        for (int j = 0; j < graph->V; j++) {
+            if (graph->adj[i][j]) {
+                edge_count++;
+            }
+        }
+    }
+    edge_count /= 2;  // Since the graph is undirected
+
+    // Calculate density
+    float density = (2.0 * edge_count) / (node_count * (node_count - 1));
+
+    printf("Graph Metrics:\n");
+    printf("Node Count: %d\n", node_count);
+    printf("Edge Count: %d\n", edge_count);
+    printf("Density: %.2f\n", density);
+
+}
+
+
 
 
 
@@ -399,17 +479,20 @@ int main(int argc, char* argv[]) {
 
     // Run the appropriate algorithm
     switch (algorithm) {
+
+        case 0:
+            graph_metrics(&graph);  // Call the graph metrics function
+            break;
         case 1:
-            bfs(&graph, start_node);
+            bfs(&graph, start_node);  // Call the graph bfs algorithm
             break;
         case 2:
-            dfs(&graph, start_node);
+            dfs(&graph, start_node);   // Call the graph dfs algorithm
             break;
         case 3:
-            dijkstra(&graph, start_node);
+            dijkstra(&graph, start_node);   // Call the graph dijkstra algorithm 
             break;
         case 4:
-          //  printf (" the prim is sleceted ... ") ; 
            prim(&graph);  // Call Prim's Algorithm
             break;
         case 5:
@@ -423,6 +506,9 @@ int main(int argc, char* argv[]) {
             break;
         case 8:
             topologicalSort(&graph);  // Call Topological Sort
+            break;
+        case 9:
+            maxFlow(&graph, start_node, atoi(argv[4]));  
             break;
         default:
             printf("Invalid algorithm choice. Use 1 for BFS, 2 for DFS, 3 for Dijkstra, 4 for Prim's, 5 for Bellman-Ford, 6 for Kruskal's, 7 for Floyd-Warshall, or 8 for Topological Sort.\n");
