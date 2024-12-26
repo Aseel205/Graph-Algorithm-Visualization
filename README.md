@@ -1,84 +1,100 @@
-# Graph Visualization and Algorithmic Exploration Tool
+# Graph Algorithm Visualization Tool
 
-## Overview
-This project is an **interactive graph visualization tool** designed to bridge the gap between theoretical graph concepts and hands-on learning. Built with Python for user interaction and C for algorithmic efficiency, this tool enables users to intuitively build, modify, and explore graphs while leveraging the computational power of C for heavy-duty tasks.
-
-As students, we faced challenges in grasping graph theory concepts. To make the learning process easier and more engaging for others, we developed this tool as a visual and interactive aid. By combining visualization, interactivity, and advanced algorithms, we hope to make graph theory more approachable for everyone.
-
----
+This project provides an interactive Python-based tool for building and visualizing graphs. Users can add nodes and edges, perform graph operations, and apply algorithms implemented in a C backend. The tool leverages Pygame for visualization and Tkinter for user prompts.
 
 ## Features
-### Interactive Graph Building
-- **Node Management**: Add or remove nodes directly on the screen using the mouse and keyboard.
-- **Edge Creation**: Connect nodes with edges interactively.
-- **Graph Randomization**: Generate a random graph to experiment with pre-defined structures.
-- **Visualization Customization**: Modify graph properties such as edge weights, colors, and layouts.
 
-### Integrated Algorithms
-- All algorithms are implemented in C for performance optimization.
-- The Python interface seamlessly calls these C functions for tasks such as:
-  - **Breadth-First Search (BFS)** and **Depth-First Search (DFS)** with real-time path visualization.
-  - Weighted shortest-path calculations.
-  - Advanced graph analysis (e.g., cycle detection, spanning trees).
+- **Interactive Graph Building:**
+  - Add nodes by clicking on the canvas.
+  - Add weighted edges by clicking two nodes and specifying the weight.
+  - Remove nodes.
+  - Generate random graphs with a specified number of nodes and edges.
+  - Clear the entire graph.
 
-### Learning-Oriented Design
-- Step-by-step execution and visualization of algorithms.
-- Real-time feedback to understand how graph operations affect the structure.
-- Detailed insights into algorithmic processes.
+- **Zooming:**
+  - Use `+` or `-` to zoom in and out of the graph visualization.
+
+- **Graph Algorithms:**
+  - Call algorithms implemented in the C backend by pressing keys `1` to `8`.
+  - Supported algorithms:
+    1. **BFS** (Breadth-First Search)
+    2. **DFS** (Depth-First Search)
+    3. **Dijkstra's Shortest Path**
+    4. **Prim's MST** (Minimum Spanning Tree)
+    5. **Bellman-Ford**
+    6. **Kruskal's MST**
+    7. **Floyd-Warshall**
+    8. **Topological Sort**
+
+- **Simulated Terminal Output:**
+  - Algorithm results are displayed in a terminal-like area on the right side of the window.
+  - View information about selected nodes and edges.
+
+## Controls
+
+### Mouse Controls
+- **Left Click:** Add a node or select a node for edge creation.
+- **Right Click:** View detailed node information in the terminal.
+
+### Keyboard Controls
+- **`r`**: Generate a random graph (requires user input for node and edge counts).
+- **`c`**: Clear the graph.
+- **`d`**: Delete the node under the cursor.
+- **`+` / `-`**: Zoom in or out of the graph visualization.
+- **`i`**: Display information about the node under the cursor.
+- **`1-8`**: Call algorithms.
+  - Algorithms requiring a start node (e.g., BFS, DFS) use the currently selected node.
+
+### Exit
+- **`e`**: Quit the application.
+- Close the window directly.
+
+## Graph Serialization
+The Python program serializes the graph into plain text format and sends it to the C backend via subprocess. The format includes:
+
+1. **Number of nodes**
+2. **Node data:** Label, x-coordinate, y-coordinate
+3. **Number of edges**
+4. **Edge data:** Node1, Node2, weight
+
+The C backend processes the graph and returns the output for visualization.
+
+## Dependencies
+
+- **Python Libraries:**
+  - `pygame`
+  - `tkinter`
+  - `subprocess`
+  - `random`
+
+- **C Backend:**
+  - Ensure `graph_algorithms.exe` is compiled and available at the specified path.
+
+## Setup and Usage
+
+1. Clone the repository.
+2. Install required Python libraries:
+   ```bash
+   pip install pygame
+   ```
+3. Ensure `graph_algorithms.exe` is located at the correct path.
+4. Run the Python program:
+   ```bash
+   python main.py
+   ```
+5. Use the controls described above to interact with the tool.
+
+## File Structure
+
+- **`main.py`**: Python script for graph visualization and user interaction.
+- **`graph_algorithms.exe`**: C backend for executing graph algorithms.
+
+## Example Usage
+
+1. **Build a Graph:** Add nodes and connect them with weighted edges.
+2. **Run Algorithms:** Select an algorithm (e.g., BFS by pressing `1`). Results are displayed in the terminal area.
+3. **Zoom and Explore:** Zoom in or out to better view the graph structure.
 
 ---
 
-## Motivation
-Graph theory is a cornerstone of computer science but often feels abstract and challenging to students. This tool was developed with the following goals:
-- **Simplify Complexity**: Turn theoretical concepts into visual and interactive experiences.
-- **Enhance Learning**: Provide students with a hands-on way to experiment with graphs.
-- **Foster Collaboration**: Enable educators and students to explore graph theory together.
-
----
-
-## Technical Details
-### Architecture
-- **Python**: Manages the user interface and interactive features.
-- **C**: Handles computationally intensive algorithms, ensuring optimal performance.
-- **Python-C Integration**: Achieved using tools like `ctypes` or `cffi` to call C functions directly from Python.
-
-### Development Highlights
-- Designed with a focus on **user experience** and **performance**.
-- Modular code structure allows for easy addition of new features and algorithms.
-- Extensive testing to ensure the tool works seamlessly across a range of graph configurations.
-
-### Key Tools and Libraries
-- **Python**: Tkinter (or similar) for GUI development.
-- **C**: Standard libraries for algorithm implementation.
-- **Visualization**: Libraries like Matplotlib or custom Python-based solutions for real-time graph rendering.
-
----
-
-## How to Use
-1. **Install Prerequisites**:
-   - Python 3.x
-   - A C compiler (e.g., GCC).
-   - Required Python libraries (install via `pip`).
-
-2. **Run the Application**:
-   - Navigate to the project directory.
-   - Run `python visualize_graph.py` to launch the interface.
-
-3. **Start Exploring**:
-   - Use the mouse and keyboard to build and modify graphs.
-   - Select algorithms to visualize their execution in real-time.
-
----
-
-## Future Work
-- Add support for more advanced algorithms, such as community detection and graph embeddings.
-- Enhance the user interface with drag-and-drop capabilities.
-- Incorporate 3D visualization for complex graphs.
-- Support larger graphs by optimizing rendering and data handling.
-
----
-
-## Acknowledgments
-We extend our gratitude to our instructors and peers who inspired and supported this project. Special thanks to everyone who contributed valuable feedback to refine the tool.
-
-This tool is more than a project; it’s our contribution to making graph theory accessible and enjoyable for students everywhere.
+Developed for graph visualization and algorithm learning.
