@@ -4,12 +4,16 @@ import sys
 import random
 import tkinter as tk
 from tkinter.simpledialog import askinteger
+import time 
+from pygame.locals import *
+from pygame import font
+
 
 exe_path = r'C:\Users\aseel\OneDrive\Desktop\mini project\project3\graph_algorithms.exe'  # Absolute path to the executable
 
 # Pygame setup
 pygame.init()
-WIDTH, HEIGHT = 1200, 800
+WIDTH, HEIGHT = 1100, 750
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Graph Algorithm Visualization")
 
@@ -230,10 +234,77 @@ def get_node_info(node, graph):
     edges_info = "\n".join(edges) if edges else "No edges connected"
     return f"Node {node.label} at ({node.x}, {node.y})\nConnected Edges:\n{edges_info}"
 
-import time  # For adding a delay before exiting
+
+def calculate_metrics(graph):
+    """Calculate and return real-time graph metrics."""
+    num_nodes = len(graph.nodes)
+    num_edges = sum(len(neighbors) for neighbors in graph.edges.values()) // 2  # Undirected edges
+    density = (2 * num_edges) / (num_nodes * (num_nodes - 1)) if num_nodes > 1 else 0
+
+    # Count connected components using a simple BFS/DFS approach
+    visited = set()
+    components = 0
+
+    def dfs(node_label):
+        stack = [node_label]
+        while stack:
+            node = stack.pop()
+            for neighbor in graph.edges.get(node, {}):
+                if neighbor not in visited:
+                    visited.add(neighbor)
+                    stack.append(neighbor)
+
+    for node in graph.nodes:
+        if node.label not in visited:
+            visited.add(node.label)
+            dfs(node.label)
+            components += 1
+
+    return num_nodes, num_edges, density, components
+
+
+def draw_metrics(graph):
+    """Draw the real-time metrics in the lower-right area of the sidebar."""
+    metrics_surface = pygame.Surface((WIDTH // 3, HEIGHT // 3))  # Use a third of the sidebar for metrics
+    metrics_surface.fill(WHITE)  # Background color for metrics area
+
+    # Calculate metrics
+    num_nodes, num_edges, density, components = calculate_metrics(graph)
+
+    # Render metrics
+    font = pygame.font.SysFont('Courier', 20)  # Font for metrics
+    metrics_text = [
+        f"Nodes: {num_nodes}",
+        f"Edges: {num_edges}",
+        f"Density: {density:.3f}",
+        f"Components: {components}"
+    ]
+
+    y_offset = 10  # Initial vertical offset
+    for text in metrics_text:
+        rendered_text = font.render(text, True, BLACK)  # Black text
+        metrics_surface.blit(rendered_text, (10, y_offset))  # Draw text on metrics surface
+        y_offset += 30  # Line spacing
+
+    # Place the metrics surface in the lower-right area of the sidebar
+    screen.blit(metrics_surface, (WIDTH - WIDTH // 3, HEIGHT - HEIGHT // 3))
 
 
 def main():
+    pygame.init()
+    pygame.mixer.init()
+
+    # Set up the display
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    pygame.display.set_caption("Graph Visualization")  # Set a cool title for the window
+
+    # Load and set window icon (your logo image)
+    logo = pygame.image.load('logo.png')
+    pygame.display.set_icon(logo)
+
+    # Load sound effect for adding a node
+    add_node_sound = pygame.mixer.Sound("vee_pop.mp3")
+
     graph = Graph()  # Initialize the graph
     running = True  # Main loop control
     selected_node = None  # Node selection for edge creation
@@ -243,6 +314,13 @@ def main():
 
     current_node_under_cursor = None  # To store the node under the cursor
 
+    # Splash Screen - Show logo
+    screen.fill(WHITE)
+    logo_rect = logo.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+    screen.blit(logo, logo_rect)  # Display logo
+    pygame.display.update()
+    time.sleep(5)  # Display the logo for 5 seconds
+
     while running:
         screen.fill(WHITE)  # Clear the screen
         for event in pygame.event.get():  # Check for events
@@ -250,7 +328,6 @@ def main():
                 running = False
             elif event.type == pygame.MOUSEBUTTONDOWN:  # Handle mouse clicks
                 x, y = pygame.mouse.get_pos()
-                # Check if click is in the graph visualization area (left portion of the screen)
                 if x < WIDTH - WIDTH // 3 and zoom_level == 1:  # Allow clicks only when zoom level is 1
                     clicked_node = graph.find_node(x / zoom_level, y / zoom_level)  # Adjust for zoom
                     if clicked_node:
@@ -269,6 +346,7 @@ def main():
                             selected_node = clicked_node
                     else:
                         graph.add_node(x / zoom_level, y / zoom_level)  # Adjust for zoom
+                        add_node_sound.play()  # Play sound when adding a node
                         selected_node = None
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_r:  # Generate random graph
@@ -278,33 +356,21 @@ def main():
                         graph.generate_random_graph(num_nodes, num_edges)
                 elif event.key == pygame.K_c:  # Clear the graph
                     graph = Graph()
-
                 elif event.key == pygame.K_e:  # Exit the program
                     running = False
-                    
                     # Special exit effect
                     screen.fill(WHITE)
-                    font = pygame.font.SysFont(None, 48)  # Adjust font size to fit better
 
-                    # Split the string into lines to fit the screen better
-                    goodbye_text_lines = [
-                        "We hope you enjoyed graphing!",
-                        "Remember, graphs are like relationships:",
-                        "they have their ups and downs,",
-                        "but they're always better with connections.",
-                        "See you next time!"
-                    ]
+                    # Load the goodbye image
+                    goodbye_image = pygame.image.load('goodbye.png')
+                    image_rect = goodbye_image.get_rect(center=(WIDTH // 2, HEIGHT // 2))
 
-                    # Render each line of the goodbye message
-                    y_offset = HEIGHT // 2 - len(goodbye_text_lines) * 24 // 2  # Center the text vertically
-                    for line in goodbye_text_lines:
-                        line_text = font.render(line, True, (138, 88, 197))  # Purple color
-                        screen.blit(line_text, (WIDTH // 2 - line_text.get_width() // 2, y_offset))
-                        y_offset += 50  # Space between lines
-
-                    pygame.display.update()  # Update the display to show the goodbye message
-                    time.sleep(8)  # Show the goodbye message for 3 seconds
-
+                    # Blit the goodbye image onto the screen
+                    screen.blit(goodbye_image, image_rect)
+                    pygame.display.update()  # Update the display to show the goodbye image
+                    time.sleep(3)  # Show the goodbye image for 3 seconds
+                    
+            
                 elif event.key == pygame.K_d:  # Delete a node
                     x, y = pygame.mouse.get_pos()
                     if x < WIDTH - WIDTH // 3 and zoom_level == 1:  # Ensure click is in the graph visualization area
@@ -337,6 +403,9 @@ def main():
         # Draw the terminal output on the right side
         draw_terminal()
 
+        # Draw real-time metrics in the lower-right area
+        draw_metrics(graph)
+
         # Update the display
         pygame.display.update()
 
@@ -345,3 +414,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
