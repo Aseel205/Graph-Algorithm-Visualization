@@ -57,7 +57,7 @@ This project is an interactive Python application for visualizing and interactin
 - `I`: Display information about the node under the mouse pointer.
 
 #### Algorithm Execution:
-
+- `0`: Display Graph Information .
 - `1`: Breadth-First Search (BFS).
 - `2`: Depth-First Search (DFS).
 - `3`: Dijkstra's Algorithm.
@@ -66,6 +66,7 @@ This project is an interactive Python application for visualizing and interactin
 - `6`: Kruskal's Algorithm.
 - `7`: Floyd-Warshall Algorithm.
 - `8`: Topological Sort.
+- `9`: Maximum Flow.
 
 ## Implementation Details
 
