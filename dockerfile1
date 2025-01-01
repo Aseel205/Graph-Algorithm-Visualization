@@ -1,0 +1,52 @@
+# Use an official Ubuntu image as the base
+FROM ubuntu:latest
+
+# Set environment variables to avoid interactive prompts during installation
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Add the necessary repository and install essential tools
+RUN apt-get update && \
+    apt-get install -y software-properties-common && \
+    add-apt-repository ppa:ubuntu-toolchain-r/test && \
+    apt-get update && \
+    apt-get install -y \
+    build-essential \
+    cmake \
+    python3 \
+    python3-pip \
+    libsdl2-dev \
+    python3-tk \
+    alsa-utils \
+    libasound2-plugins \
+    libasound2-data \
+    libpulse0 \
+    ffmpeg \
+    && apt-get clean
+
+# Set up PulseAudio to allow audio functionality
+RUN apt-get install -y pulseaudio
+
+# Install pytest using pip (allow breaking system packages)
+RUN python3 -m pip install pytest --break-system-packages
+
+# Install pygame using pip
+RUN python3 -m pip install pygame --break-system-packages
+
+# Set environment variables to fix runtime issues with audio
+ENV SDL_AUDIODRIVER=alsa \
+    XDG_RUNTIME_DIR=/tmp/runtime-root
+
+# Create runtime directory for XDG
+RUN mkdir -p /tmp/runtime-root && chmod 700 /tmp/runtime-root
+
+# Set the working directory inside the container
+WORKDIR /usr/src/app
+
+# Copy your project files into the container
+COPY . .
+
+# Test ALSA inside the container
+RUN aplay -l || true
+
+# Set default command to keep the container running interactively
+CMD ["/bin/bash"]
