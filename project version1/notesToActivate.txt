@@ -1,0 +1,25 @@
+pytest test_graph.py = to run test file  
+
+build the docker image : 
+
+docker build -t image2 .
+
+
+
+creat a container : 
+docker run --rm -it image2 /bin/bash
+
+then run this commands to activate the libraries : 
+source /venv/bin/activate
+pip show pytest
+pip show pygame
+
+
+
+thenn you can activate the files :
+pytest test_graph.py
+python Graph.py
+
+
+notes: 
+The container gets access to the files through the COPY . . line in your Dockerfile.
