@@ -1,0 +1,9 @@
+Instructions:
+
+Click on the screen to add nodes.
+Press C to clear the graph, R to generate a random graph.
+Press B for BFS and D for DFS to see the traversal animations
+You can now press E to exit the program.
+If you click on a node and then another node, an edge will be created.
+
+Press S to select a start node. Click on the desired node, and it will be highlighted in green to indicate that it is the start node
